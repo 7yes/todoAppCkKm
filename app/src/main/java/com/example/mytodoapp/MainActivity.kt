@@ -27,6 +27,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     TasksScreen(taskViewModel)
+                    //AddTasksDialog(show = true) {
+                    //}
                 }
             }
         }
