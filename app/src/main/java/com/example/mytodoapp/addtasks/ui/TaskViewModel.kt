@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mytodoapp.addtasks.domain.AddTaskUseCase
+import com.example.mytodoapp.addtasks.domain.DeleteTaskUseCase
 import com.example.mytodoapp.addtasks.domain.GetTasksUseCase
 import com.example.mytodoapp.addtasks.domain.UpdateUseCase
 import com.example.mytodoapp.addtasks.ui.TaskUiState.Success
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
     getTasksUseCase: GetTasksUseCase,
-    private val updateUseCase: UpdateUseCase
+    private val updateUseCase: UpdateUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase
 ) : ViewModel() {
     //conectar al flow del repositori mediante el UseCase, se mapeo como successsy el
     //uiState es lo que va a leer la UI
@@ -66,6 +68,9 @@ class TaskViewModel @Inject constructor(
     }
 
     fun onItemRemove(taskModel: TaskModel) {
+        viewModelScope.launch {
+            deleteTaskUseCase(taskModel)
+        }
 // borrar item
 //         val task = _tasks.find { it == taskModel }
 //        _tasks.remove(task)
