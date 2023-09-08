@@ -19,4 +19,6 @@ class TaskRepository @Inject constructor(private val taskDao:TaskDao){
     suspend fun add(taskModel: TaskModel){
         taskDao.addTask(taskModel.toDB())
     }
+
+    suspend fun update(taskModel: TaskModel) = taskDao.updateTask(taskModel.toDB())
 }

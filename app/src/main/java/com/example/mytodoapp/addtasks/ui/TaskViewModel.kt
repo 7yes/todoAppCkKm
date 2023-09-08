@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mytodoapp.addtasks.domain.AddTaskUseCase
 import com.example.mytodoapp.addtasks.domain.GetTasksUseCase
+import com.example.mytodoapp.addtasks.domain.UpdateUseCase
 import com.example.mytodoapp.addtasks.ui.TaskUiState.Success
 import com.example.mytodoapp.addtasks.ui.model.TaskModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +22,14 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
-    getTasksUseCase: GetTasksUseCase
+    getTasksUseCase: GetTasksUseCase,
+    private val updateUseCase: UpdateUseCase
 ) : ViewModel() {
     //conectar al flow del repositori mediante el UseCase, se mapeo como successsy el
     //uiState es lo que va a leer la UI
     val uiState: StateFlow<TaskUiState> = getTasksUseCase().map(::Success)
         .catch { TaskUiState.Error(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),TaskUiState.Loading )
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskUiState.Loading)
 
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
@@ -40,11 +42,11 @@ class TaskViewModel @Inject constructor(
     }
 
     fun onTasksCreated(it: String) {
-      //  _tasks.add(TaskModel(task = it, selected = false))
+        //  _tasks.add(TaskModel(task = it, selected = false))
         _showDialog.value = false
 
         viewModelScope.launch {
-            addTaskUseCase(TaskModel(task = it,selected = false))
+            addTaskUseCase(TaskModel(task = it, selected = false))
         }
     }
 
@@ -53,6 +55,9 @@ class TaskViewModel @Inject constructor(
     }
 
     fun onCheckBoxSelected(taskModel: TaskModel) {
+        viewModelScope.launch {
+            updateUseCase(taskModel.copy(selected = !taskModel.selected))
+        }
         //Actualizar checkBox
 //        val index = _tasks.indexOf(taskModel)
 //        _tasks[index] = _tasks[index].let {
